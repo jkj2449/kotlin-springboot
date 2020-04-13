@@ -1,34 +1,34 @@
 package com.kotlin.springboot.controller
 
+import com.kotlin.springboot.service.PostsService
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.servlet.ModelAndView
 
 @Controller
 class IndexController {
+    @Autowired
+    lateinit var postsService: PostsService
+
     @GetMapping("/")
-    fun index(): ModelAndView {
-        val mav = getModelAndView("Home", "index")
-        return mav
+    fun index(model: Model): String {
+        model.addAttribute("posts", postsService.findByAllDesc())
+        return "index"
     }
 
-    @GetMapping("/sign")
-    fun sign(): ModelAndView {
-        val mav = getModelAndView("Sign", "sign")
-        return mav
+    @GetMapping("/posts/save")
+    fun postSave() : String {
+        return "posts-save"
     }
 
-    @GetMapping("/login")
-    fun login(): ModelAndView {
-        val mav = getModelAndView("Login", "login")
-        return mav
-    }
+    @GetMapping("/posts/update/{id}")
+    fun postsUpdate(@PathVariable id: Long, model: Model): String {
+        val dto = postsService.findById(id)
+        model.addAttribute("post", dto)
 
-    private fun getModelAndView(title: String, path: String): ModelAndView {
-        val mav = ModelAndView()
-        mav.addObject("title", title)
-        mav.viewName = path
-        return mav
+        return "posts-update"
     }
 }
